@@ -22,6 +22,7 @@ coverage: strict
 | `tools/` | dir | The linter and companion tooling | required |
 | `docs/` | dir | Essays, posts, and reports about the paradigm | |
 | `example/` | dir | Fully schematized fixture repos used in docs and tests | required |
+| `tests/` | dir | Scenario test-suite for the tooling | required |
 | `README.md` | file | Human-facing overview and quickstart | required |
 | `CLAUDE.md` | file | Agent instructions, including the SCHEMA protocol | required |
 

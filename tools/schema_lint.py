@@ -175,7 +175,14 @@ def check_dir(dirpath: Path, root: Path, report: Report,
     entries = sorted(dirpath.iterdir(), key=lambda p: p.name)
     for child in entries:
         name = child.name
-        if name in ALWAYS_IGNORED or name in IMPLICIT_ALLOWED:
+        if name in IMPLICIT_ALLOWED:
+            continue
+        if name in ALWAYS_IGNORED:
+            # Registering one of these documents it; contents are never
+            # verified and it is never descended into.
+            row = _match_row(name, child.is_dir(), doc)
+            if row is not None:
+                row.seen = True
             continue
         if name.startswith(".") and not include_hidden \
                 and name not in registered_names:
@@ -183,14 +190,7 @@ def check_dir(dirpath: Path, root: Path, report: Report,
 
         row = _match_row(name, child.is_dir(), doc)
         if row is None:
-            # Registered under the wrong kind?
-            wrong = next((r for r in doc.rows
-                          if r.kind != "pattern" and r.entry == name), None)
-            if wrong is not None:
-                actual = "dir" if child.is_dir() else "file"
-                report.error(f"{rel}: '{name}' registered as {wrong.kind} "
-                             f"but is a {actual}")
-            elif doc.coverage == "strict":
+            if doc.coverage == "strict":
                 report.error(f"{rel}: unregistered entry '{name}' "
                              f"(coverage: strict)")
             elif doc.coverage == "listed":
@@ -198,7 +198,16 @@ def check_dir(dirpath: Path, root: Path, report: Report,
             continue
 
         row.seen = True
-        if child.is_dir() and not row.terminal:
+        if row.kind != "pattern":
+            actual = "dir" if child.is_dir() else "file"
+            if row.kind != actual:
+                report.error(f"{rel}: '{name}' registered as {row.kind} "
+                             f"but is a {actual}")
+                continue
+        # Symlinked dirs are entries, not subtrees: never descend (their
+        # targets are checked wherever they really live, and cycles must
+        # not hang the walk).
+        if child.is_dir() and not row.terminal and not child.is_symlink():
             check_dir(child, root, report, include_hidden)
 
     for row in doc.rows:
@@ -236,13 +245,32 @@ coverage: listed
 """
 
 
+def _terminal_marked(root: Path) -> set[Path]:
+    """Dirs that existing schemas mark terminal/generated — init keeps out."""
+    terminals: set[Path] = set()
+    scratch = Report()
+    for schema_path in root.rglob("SCHEMA.md"):
+        parts = set(schema_path.relative_to(root).parts[:-1])
+        if parts & ALWAYS_IGNORED or any(p.startswith(".") for p in parts):
+            continue
+        doc = parse_schema(schema_path, scratch)
+        for row in doc.rows:
+            if row.kind == "dir" and row.terminal:
+                terminals.add((schema_path.parent / row.entry).resolve())
+    return terminals
+
+
 def init_tree(root: Path) -> list[Path]:
     created: list[Path] = []
+    terminals = _terminal_marked(root)
     for dirpath in sorted([root, *root.rglob("*")]):
-        if not dirpath.is_dir():
+        if not dirpath.is_dir() or dirpath.is_symlink():
             continue
         parts = set(dirpath.relative_to(root).parts)
         if parts & ALWAYS_IGNORED or any(p.startswith(".") for p in parts):
+            continue
+        resolved = dirpath.resolve()
+        if any(t == resolved or t in resolved.parents for t in terminals):
             continue
         schema_path = dirpath / "SCHEMA.md"
         if schema_path.exists():

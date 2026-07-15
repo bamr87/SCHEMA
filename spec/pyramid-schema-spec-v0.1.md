@@ -162,13 +162,20 @@ never deferred. The linter in CI makes deferral impossible to hide.
   (registered as file, exists as dir), unregistered entries under `strict`,
   malformed frontmatter/table. Warnings: unregistered entries under `listed`,
   stale literal entries (registered but absent, not `required`), unknown rule
-  tokens. Exit 1 on errors (or on warnings with `--werror`).
+  tokens. A kind mismatch is one error; the entry is not also reported as
+  missing, and a dir registered under the wrong kind is not descended into.
+  Exit 1 on errors (or on warnings with `--werror`).
 - `init <path>`: scaffolds a `SCHEMA.md` (coverage `listed`, purposes `TODO`)
   into every directory that lacks one, enumerating actual contents. Never
-  overwrites. This is how an existing repo — the chaos — gets its first course
-  of stone.
+  overwrites, and never scaffolds inside a directory an existing schema marks
+  `terminal` or `generated`. This is how an existing repo — the chaos — gets
+  its first course of stone.
 - Traversal only descends into registered, non-terminal directories.
-  `.git`, `node_modules`, `__pycache__`, and similar are always ignored.
+  Symlinked directories are entries, not subtrees: they are matched and
+  kind-checked but never descended into (their targets are checked wherever
+  they really live, and cycles must not hang the walk). `.git`,
+  `node_modules`, `__pycache__`, and similar are always ignored; registering
+  one documents it without verifying its contents.
 
 ## 6. Adoption path
 
