@@ -1,0 +1,17 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Self-validate the pyramid (warnings are errors)
+        run: python3 tools/schema_lint.py check . --werror
+      - name: Scenario tests — linter
+        run: python3 tests/test_schema_lint.py
+      - name: Scenario tests — benchmark
+        run: python3 tests/test_schema_bench.py

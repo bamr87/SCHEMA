@@ -17,6 +17,7 @@ coverage: strict
 | entry | kind | purpose | rules |
 |---|---|---|---|
 | `schema_lint.py` | file | Validator (`check`) and scaffolder (`init`) for schema pyramids | required |
+| `schema_bench.py` | file | Context-cost benchmark: schema-chain reads vs tree-dump baseline | required |
 
 ## Placement
 

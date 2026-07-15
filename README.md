@@ -27,4 +27,7 @@ and maintain the schemas without being told.
 Start with `SCHEMA.md` in this directory — reading it instead of this list is
 the whole idea. The spec lives in `spec/`, the seed template in `templates/`,
 the agent protocol in `protocol/`, the linter in `tools/`, and a fully
-schematized fixture repo in `example/acme-app/`.
+schematized fixture repo in `example/acme-app/`. The scenario test-suite in
+`tests/` exercises the linter against real repository shapes, and
+`tools/schema_bench.py` measures the context-token cost of schema-chain reads
+against raw tree exploration.

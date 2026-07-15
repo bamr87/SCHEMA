@@ -16,6 +16,9 @@ coverage: strict
 
 | entry | kind | purpose | rules |
 |---|---|---|---|
+| `.github/` | dir | GitHub Actions CI: self-lint (`--werror`) plus the scenario tests | terminal |
+| `.claude/` | dir | Local Claude Code session settings | terminal |
+| `.gitignore` | file | VCS ignores: Python bytecode and OS noise | |
 | `spec/` | dir | The Pyramid Schema specification, one file per version | required |
 | `templates/` | dir | Seed templates copied into new directories | required |
 | `protocol/` | dir | Agent-facing protocol text (CLAUDE.md drop-ins) | required |
