@@ -1,0 +1,11 @@
+{
+  "name": "acme-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fixture web app for the Pyramid Schema paradigm",
+  "main": "dist/bundle.js",
+  "scripts": {
+    "build": "echo 'bundling…' && cp -r src dist 2>/dev/null || true",
+    "lint:schema": "python3 ../../tools/schema_lint.py check ."
+  }
+}
