@@ -58,6 +58,17 @@ class TestSurvey(unittest.TestCase):
         r = schema_bench.survey(self.root)
         self.assertEqual(r["files"], 0)          # bundle.js not listed
         self.assertEqual(r["schematized_dirs"], 1)
+
+    def test_repo_boundaries_are_not_entered_on_either_side(self):
+        """A submodule mount (.git pointer file) is a wall, even unmarked."""
+        make_schema(self.root, "| `dep/` | dir | submodule | |")
+        mount = self.root / "dep"
+        mount.mkdir()
+        (mount / ".git").write_text("gitdir: ../.git/modules/dep\n")
+        (mount / "huge.txt").write_text("x" * 4000)
+        r = schema_bench.survey(self.root)
+        self.assertEqual(r["files"], 0)          # huge.txt not listed
+        self.assertEqual(r["schematized_dirs"], 1)
         self.assertLess(r["tree_tokens"], 20)    # just 'dist/'
 
     def test_hidden_and_ignored_are_excluded(self):

@@ -12,8 +12,10 @@ product, not overhead.
 python3 tools/schema_lint.py check .            # validate this package (must stay green)
 python3 tools/schema_lint.py check . --werror   # CI mode: warnings fail too
 python3 tools/schema_lint.py check . --fix      # register strays / prune stale rows, re-check
+python3 tools/schema_lint.py check <repo> --federation  # + submodule seam checks (monorepos)
 python3 tools/schema_lint.py init <repo>        # scaffold an existing repo
-python3 tests/test_schema_lint.py               # scenario test-suite (54 real-world cases)
+python3 tests/test_schema_lint.py               # scenario test-suite (real-world cases)
+git config core.hooksPath .githooks             # once per clone: pre-commit lint
 ```
 
 ## Rules of this repo
@@ -41,6 +43,9 @@ nearest schema wins.
 guess: add a row to the appropriate Structure table (and a Placement route if
 it will recur), then create the file. Respect `## Forbidden`. Never hand-edit
 entries marked `generated`. Never descend into directories marked `terminal`.
+Submodule mounts are separate pyramids: treat them as `terminal` even when
+unmarked — their interiors are governed by their own root `SCHEMA.md`, in
+their own repo.
 
 **Propagate.** Creating a directory is one atomic act with three parts:
 1. Create the directory.

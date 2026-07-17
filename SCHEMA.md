@@ -17,6 +17,7 @@ coverage: strict
 | entry | kind | purpose | rules |
 |---|---|---|---|
 | `.github/` | dir | GitHub Actions CI: self-lint (`--werror`) plus the scenario tests | terminal |
+| `.githooks/` | dir | Version-controlled git hooks (`git config core.hooksPath .githooks`) | |
 | `.claude/` | dir | Local Claude Code session settings | terminal |
 | `.gitignore` | file | VCS ignores: Python bytecode and OS noise | |
 | `spec/` | dir | The Pyramid Schema specification, one file per version | required |

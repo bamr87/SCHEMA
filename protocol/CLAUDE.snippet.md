@@ -17,6 +17,9 @@ nearest schema wins.
 guess: add a row to the appropriate Structure table (and a Placement route if
 it will recur), then create the file. Respect `## Forbidden`. Never hand-edit
 entries marked `generated`. Never descend into directories marked `terminal`.
+Submodule mounts are separate pyramids: treat them as `terminal` even when
+unmarked — their interiors are governed by their own root `SCHEMA.md`, in
+their own repo.
 
 **Propagate.** Creating a directory is one atomic act with three parts:
 1. Create the directory.

@@ -611,5 +611,189 @@ class TestRobustness(ScenarioCase):
         self.assertEqual(code, 2)
 
 
+# ---------------------------------------------------------------- boundaries
+
+
+class TestRepoBoundaries(ScenarioCase):
+    """Git repo boundaries: submodules, nested clones. Walks never cross."""
+
+    def submodule(self, rel: str) -> Path:
+        """A fake initialized submodule: a dir carrying a .git pointer file."""
+        mount = self.mkdir(rel)
+        self.write(f"{rel}/.git", "gitdir: ../../.git/modules/dep\n")
+        return mount
+
+    def test_terminal_marked_submodule_is_clean(self):
+        """The blessed shape: mount registered terminal, interior ignored."""
+        self.schema("", [("vendor-lib/", "dir", "vendored pyramid",
+                          "terminal")])
+        self.submodule("vendor-lib")
+        self.write("vendor-lib/deep/junk.txt")   # no SCHEMA.md — child's job
+        self.assertClean(self.check())
+
+    def test_unmarked_submodule_warns_and_is_not_descended(self):
+        """Missing 'terminal' nudges a warning, but the seam still holds."""
+        self.schema("", [("dep/", "dir", "a submodule", "")])
+        self.submodule("dep")
+        self.write("dep/inner/x.txt")            # would error if descended
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertIn("repo boundary", out)
+        self.assertNotIn("inner", out)
+        code_w, _ = self.check("--werror")
+        self.assertEqual(code_w, 1)
+
+    def test_nested_clone_git_dir_is_also_a_boundary(self):
+        """A .git *directory* (plain nested clone) counts the same."""
+        self.schema("", [("clone/", "dir", "nested checkout", "")])
+        self.mkdir("clone/.git")
+        self.write("clone/inner/x.txt")
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertIn("repo boundary", out)
+        self.assertNotIn("inner", out)
+
+    def test_strict_unregistered_submodule_still_errors(self):
+        """Coverage rules still apply to the mount itself — only the
+        descent is suppressed."""
+        self.schema("", [], coverage="strict")
+        self.submodule("dep")
+        self.write("dep/stuff/thing.txt")
+        code, out = self.check()
+        self.assertEqual(code, 1, out)
+        self.assertIn("unregistered entry 'dep'", out)
+        self.assertNotIn("stuff", out)
+
+    def test_init_does_not_scaffold_inside_submodule(self):
+        """init registers the mount in the parent but never writes into it."""
+        self.write("app.py")
+        self.submodule("dep")
+        self.mkdir("dep/inner")
+        code, out = run_cli("init", str(self.root))
+        self.assertEqual(code, 0, out)
+        root_schema = (self.root / "SCHEMA.md").read_text(encoding="utf-8")
+        self.assertIn("dep/", root_schema)
+        self.assertFalse((self.root / "dep" / "SCHEMA.md").exists())
+        self.assertFalse((self.root / "dep" / "inner" / "SCHEMA.md").exists())
+
+
+# ---------------------------------------------------------------- federation
+
+
+class TestFederation(ScenarioCase):
+    """check --federation: seam invariants over .gitmodules."""
+
+    def submodule(self, rel: str, seeded_version: str | None = None) -> Path:
+        mount = self.mkdir(rel)
+        self.write(f"{rel}/.git", "gitdir: ../../.git/modules/dep\n")
+        if seeded_version is not None:
+            self.write(
+                f"{rel}/SCHEMA.md",
+                f'---\nschema: "{seeded_version}"\ncoverage: listed\n---\n\n'
+                "# SCHEMA — child\n\n## Structure\n\n"
+                "| entry | kind | purpose | rules |\n|---|---|---|---|\n")
+        return mount
+
+    def gitmodules(self, *paths: str) -> None:
+        self.write(".gitmodules", "".join(
+            f'[submodule "{p}"]\n\tpath = {p}\n'
+            f"\turl = https://github.com/x/{Path(p).name}.git\n"
+            for p in paths))
+
+    def test_no_gitmodules_is_a_clean_noop(self):
+        self.schema("", [])
+        code, out = self.check("--federation")
+        self.assertEqual(code, 0, out)
+        self.assertIn("no .gitmodules", out)
+
+    def test_green_seam(self):
+        """Registered terminal mount + seeded child at the right version."""
+        self.gitmodules("libs/dep")
+        self.schema("", [("libs/", "dir", "dependencies", "required")])
+        self.schema("libs", [("dep/", "dir", "vendored pyramid", "terminal")])
+        self.submodule("libs/dep", seeded_version="0.1")
+        code, out = self.check("--federation")
+        self.assertClean((code, out))
+        self.assertIn("1 submodule(s) — 1 ok, 0 version-drift, "
+                      "0 unseeded, 0 uninitialized", out)
+
+    def test_unseeded_child_warns(self):
+        self.gitmodules("libs/dep")
+        self.schema("", [("libs/", "dir", "dependencies", "required")])
+        self.schema("libs", [("dep/", "dir", "vendored pyramid", "terminal")])
+        self.submodule("libs/dep")               # no root SCHEMA.md inside
+        code, out = self.check("--federation")
+        self.assertEqual(code, 0, out)
+        self.assertIn("not seeded", out)
+        self.assertIn("1 unseeded", out)
+        code_w, _ = self.check("--federation", "--werror")
+        self.assertEqual(code_w, 1)
+
+    def test_version_drift_warns_and_expect_schema_overrides(self):
+        self.gitmodules("libs/dep")
+        self.schema("", [("libs/", "dir", "dependencies", "required")])
+        self.schema("libs", [("dep/", "dir", "vendored pyramid", "terminal")])
+        self.submodule("libs/dep", seeded_version="0.0")
+        code, out = self.check("--federation")
+        self.assertEqual(code, 0, out)
+        self.assertIn("declares schema 0.0", out)
+        self.assertIn("1 version-drift", out)
+        code2, out2 = self.check("--federation", "--expect-schema", "0.0")
+        self.assertEqual(code2, 0, out2)
+        self.assertIn("1 ok, 0 version-drift", out2)
+
+    def test_unregistered_mount_is_error(self):
+        self.gitmodules("libs/dep")
+        self.schema("", [("libs/", "dir", "dependencies", "required")])
+        self.schema("libs", [])                  # no dep/ row
+        self.submodule("libs/dep", seeded_version="0.1")
+        code, out = self.check("--federation")
+        self.assertEqual(code, 1, out)
+        self.assertIn("submodule mount not registered", out)
+
+    def test_non_terminal_mount_is_error(self):
+        self.gitmodules("libs/dep")
+        self.schema("", [("libs/", "dir", "dependencies", "required")])
+        self.schema("libs", [("dep/", "dir", "vendored pyramid", "")])
+        self.submodule("libs/dep", seeded_version="0.1")
+        code, out = self.check("--federation")
+        self.assertEqual(code, 1, out)
+        self.assertIn("must be marked 'terminal'", out)
+
+    def test_uninitialized_submodule_warns(self):
+        self.gitmodules("libs/ghost")            # listed, never cloned
+        self.schema("", [("libs/", "dir", "dependencies", "required")])
+        self.schema("libs", [])
+        self.mkdir("libs")
+        code, out = self.check("--federation")
+        self.assertEqual(code, 0, out)
+        self.assertIn("not initialized", out)
+        self.assertIn("1 uninitialized", out)
+
+    def test_mount_without_parent_schema_is_error(self):
+        self.gitmodules("zone/dep")
+        self.schema("", [])                      # zone/ unregistered, listed
+        self.submodule("zone/dep", seeded_version="0.1")
+        code, out = self.check("--federation")
+        self.assertEqual(code, 1, out)
+        self.assertIn("mount unregistered", out)
+
+    def test_gitmodules_parser_handles_quirks(self):
+        """Comments, tabs, extra keys, section name != path (hub reality)."""
+        gm = self.write(".gitmodules", (
+            "# fleet registry\n"
+            '[submodule "README"]\n'
+            "\tpath = projects/readme\n"
+            "\turl = https://github.com/x/README.git\n"
+            "\tupdate = merge\n"
+            '[submodule "no-path-entry"]\n'
+            "\turl = https://github.com/x/ghost.git\n"
+        ))
+        entries = schema_lint._parse_gitmodules(gm)
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0]["path"], "projects/readme")
+        self.assertEqual(entries[0]["update"], "merge")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

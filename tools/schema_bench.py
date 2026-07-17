@@ -10,10 +10,11 @@ before placing or finding a file:
              — O(depth) tokens, with purposes, routing, and rules included.
 
 Both sides walk the same tree under the same conservative rules: hidden
-entries and ALWAYS_IGNORED names (.git, node_modules, …) are excluded, and
-directories a schema marks terminal/generated are not entered — i.e. the
-baseline models a *competent* agent that already skips junk, so reported
-reductions are lower bounds.
+entries and ALWAYS_IGNORED names (.git, node_modules, …) are excluded,
+directories a schema marks terminal/generated are not entered, and git repo
+boundaries (submodules) are not crossed — i.e. the baseline models a
+*competent* agent that already skips junk, so reported reductions are lower
+bounds.
 
 Token counts use the standard ~4 characters/token heuristic; the comparison
 is between texts measured identically, so the ratio is robust to the
@@ -32,7 +33,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from schema_lint import ALWAYS_IGNORED, Report, parse_schema  # noqa: E402
+from schema_lint import (ALWAYS_IGNORED, Report, is_repo_boundary,  # noqa: E402
+                         parse_schema)
 
 
 def tokens(text: str) -> int:
@@ -76,9 +78,11 @@ def survey(root: Path) -> dict:
             crel = f"{rel}/{name}".removeprefix("./")
             if child.is_dir():
                 listing_lines.append(f"{crel}/")
-                if name not in terminal and not child.is_symlink():
+                if name not in terminal and not child.is_symlink() \
+                        and not is_repo_boundary(child):
                     walk(child, chain_tokens + own)
-                # terminal dirs: listed, never entered — on either side
+                # terminal dirs and repo boundaries (submodules):
+                # listed, never entered — on either side
             else:
                 listing_lines.append(crel)
                 n_files += 1
