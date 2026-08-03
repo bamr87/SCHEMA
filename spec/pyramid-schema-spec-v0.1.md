@@ -117,7 +117,7 @@ coverage: listed
 | token | meaning |
 |---|---|
 | `required` | Entry must exist (for patterns: at least one match). Absence is an error. |
-| `generated` | Produced by tooling. Never hand-edited; contents are not checked. For dirs, implies `terminal`. |
+| `generated` | Produced by tooling. Never hand-edited; contents are not checked, and absence is tolerated (no stale warning) unless also `required` — the token for gitignored/ephemeral artifacts. For dirs, implies `terminal`. |
 | `terminal` | Dirs only. Do not descend, do not require a SCHEMA.md inside (vendored code, build output, data dumps). |
 
 Unknown tokens produce a lint warning; prefix experimental tokens with `x-` to
@@ -145,9 +145,11 @@ from root to the target directory. Placement becomes a lookup: consult
 `## Placement` at each level and descend. Respect `## Forbidden` and never touch
 `generated` entries.
 
-**Propagate.** Creating a directory is a two-part atomic act: (1) create its
-`SCHEMA.md` from the template, (2) register it in the parent's Structure table.
-A course of the pyramid cannot be laid without bonding to the course beneath it.
+**Propagate.** Creating a directory is one atomic act with three parts:
+(1) create the directory, (2) create its `SCHEMA.md` — from the template, or
+scaffolded with `schema_lint.py init` — and (3) register it in the parent's
+Structure table. A course of the pyramid cannot be laid without bonding to the
+course beneath it.
 
 **Maintain.** Any change to a directory's contents updates its `SCHEMA.md` *in the
 same commit*. Schema edits ride with the change they describe — never batched,
@@ -161,10 +163,18 @@ never deferred. The linter in CI makes deferral impossible to hide.
   in a traversed directory, missing `required` entries, kind mismatches
   (registered as file, exists as dir), unregistered entries under `strict`,
   malformed frontmatter/table. Warnings: unregistered entries under `listed`,
-  stale literal entries (registered but absent, not `required`), unknown rule
-  tokens. A kind mismatch is one error; the entry is not also reported as
-  missing, and a dir registered under the wrong kind is not descended into.
-  Exit 1 on errors (or on warnings with `--werror`).
+  stale literal entries (registered but absent, neither `required` nor
+  `generated`), unknown rule tokens. A kind mismatch is one error; the entry
+  is not also reported as missing, and a dir registered under the wrong kind
+  is not descended into. Exit 1 on errors (or on warnings with `--werror`).
+- `check --fix`: remediates the mechanical half of the findings before
+  re-checking — registers strays as literal rows with `TODO` purposes
+  (newly registered directories get their missing schemas scaffolded so the
+  re-check can descend), prunes stale literal rows, and touches nothing else:
+  edits are surgical and byte-preserving, and pattern, `required`, and
+  `generated` rows are never modified. The output is a reviewable diff, not a
+  finished schema: purposes still need a human or agent. Missing `required`
+  entries and missing `SCHEMA.md` files are real errors, not fixable drift.
 - `init <path>`: scaffolds a `SCHEMA.md` (coverage `listed`, purposes `TODO`)
   into every directory that lacks one, enumerating actual contents. Never
   overwrites, and never scaffolds inside a directory an existing schema marks
@@ -200,7 +210,8 @@ claim it makes is lintable.
 
 ## 8. Roadmap (post-0.1)
 
-- `check --fix`: auto-register strays and prune stale rows behind a review flag.
+- ~~`check --fix`: auto-register strays and prune stale rows behind a review
+  flag.~~ Shipped in the reference linter (§5).
 - Pattern inference in `init` (detect `YYYY-MM-DD-*.md`-style collections).
 - Directory patterns (`packages/*` monorepo layouts).
 - A packaged Claude Code skill wrapping template + linter + protocol.

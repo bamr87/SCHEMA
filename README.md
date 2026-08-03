@@ -14,6 +14,9 @@ python tools/schema_lint.py init /path/to/repo
 # Validate a pyramid
 python tools/schema_lint.py check /path/to/repo
 
+# Remediate mechanical drift: register strays, prune stale rows, re-check
+python tools/schema_lint.py check /path/to/repo --fix
+
 # Validate this package (it describes itself)
 python tools/schema_lint.py check .
 ```

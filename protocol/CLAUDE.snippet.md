@@ -20,8 +20,10 @@ entries marked `generated`. Never descend into directories marked `terminal`.
 
 **Propagate.** Creating a directory is one atomic act with three parts:
 1. Create the directory.
-2. Create its `SCHEMA.md` from `templates/SCHEMA.template.md`, filling every
-   placeholder — especially the one-line purpose.
+2. Create its `SCHEMA.md` — scaffold it with
+   `python3 tools/schema_lint.py init <new-dir>`, or copy
+   `templates/SCHEMA.template.md` where this repo carries it — and fill
+   every placeholder, especially the one-line purpose.
 3. Register it in the parent directory's Structure table.
 Never leave a new directory schemaless.
 
@@ -36,4 +38,6 @@ python tools/schema_lint.py check .
 ```
 
 Fix errors. Surface warnings to the user with a one-line explanation each if
-you choose not to fix them.
+you choose not to fix them. For mechanical drift — strays to register, stale
+rows to prune — `check --fix` applies the edits; review its diff and replace
+the TODO purposes it leaves.
