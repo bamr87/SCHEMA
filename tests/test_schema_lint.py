@@ -441,6 +441,106 @@ class TestInitScenarios(ScenarioCase):
         self.assertLess(text.index("aaa/"), text.index("zzz.txt"))
 
 
+# ---------------------------------------------------------------- fix mode
+
+
+class TestFixMode(ScenarioCase):
+    """check --fix: mechanical drift remediation an agent or CI can apply."""
+
+    def read_root_schema(self) -> str:
+        return (self.root / "SCHEMA.md").read_text(encoding="utf-8")
+
+    def test_fix_registers_stray_file(self):
+        self.schema("", [("kept.txt", "file", "existing", "")])
+        self.write("kept.txt")
+        self.write("stray.txt")
+        code, out = self.check("--fix")
+        self.assertEqual(code, 0, out)
+        self.assertIn("`stray.txt` | file | TODO", self.read_root_schema())
+        self.assertClean(self.check())  # idempotent: second run is clean
+
+    def test_fix_registers_stray_dir_and_scaffolds_subtree(self):
+        """A registered-by-fix dir must be descendable on the re-check, so
+        its missing schemas are scaffolded in the same pass."""
+        self.schema("", [])
+        self.write("newdir/inner/file.txt")
+        code, out = self.check("--fix")
+        self.assertEqual(code, 0, out)
+        self.assertIn("`newdir/` | dir | TODO", self.read_root_schema())
+        self.assertTrue((self.root / "newdir/SCHEMA.md").exists())
+        self.assertTrue((self.root / "newdir/inner/SCHEMA.md").exists())
+        self.assertClean(self.check())
+
+    def test_fix_prunes_stale_row(self):
+        self.schema("", [("gone.txt", "file", "deleted long ago", ""),
+                         ("kept.txt", "file", "still here", "")])
+        self.write("kept.txt")
+        code, out = self.check("--fix")
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("gone.txt", self.read_root_schema())
+        self.assertIn("kept.txt", self.read_root_schema())
+        self.assertClean(self.check())
+
+    def test_fix_never_touches_required_or_generated_rows(self):
+        """Missing required entries are real errors, not fixable drift; and
+        generated entries are allowed to be absent — neither is pruned."""
+        self.schema("", [
+            ("must.txt", "file", "required artifact", "required"),
+            ("built.log", "file", "ephemeral build output", "generated"),
+        ])
+        code, out = self.check("--fix")
+        self.assertEqual(code, 1, out)  # missing required still gates
+        text = self.read_root_schema()
+        self.assertIn("must.txt", text)
+        self.assertIn("built.log", text)
+
+    def test_fix_resolves_strict_stray_error(self):
+        self.schema("", [("app.py", "file", "entrypoint", "required")],
+                    coverage="strict")
+        self.write("app.py")
+        self.write("notes.md")
+        code_before, _ = self.check()
+        self.assertEqual(code_before, 1)
+        code, out = self.check("--fix")
+        self.assertEqual(code, 0, out)
+        self.assertClean(self.check())
+
+    def test_fix_preserves_purposes_and_other_sections(self):
+        extra = ("\n## Placement\n\n- Notes → `docs/`\n\n"
+                 "## Forbidden\n\n- No junk at root.\n")
+        self.schema("", [("kept.txt", "file", "the important purpose",
+                          "required")], extra=extra)
+        self.write("kept.txt")
+        self.write("stray.txt")
+        self.check("--fix")
+        text = self.read_root_schema()
+        self.assertIn("the important purpose", text)
+        self.assertIn("## Placement", text)
+        self.assertIn("- No junk at root.", text)
+
+    def test_fix_does_not_prune_pattern_rows(self):
+        """A pattern with zero matches is not stale; --fix must keep it."""
+        self.schema("", [("*.md", "pattern", "future docs", "")])
+        code, out = self.check("--fix")
+        self.assertEqual(code, 0, out)
+        self.assertIn("*.md", self.read_root_schema())
+
+    def test_fix_is_noop_on_clean_tree(self):
+        self.schema("", [("kept.txt", "file", "fine", "required")])
+        self.write("kept.txt")
+        before = self.read_root_schema()
+        code, out = self.check("--fix")
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.read_root_schema(), before)
+
+    def test_check_without_fix_never_writes(self):
+        self.schema("", [("gone.txt", "file", "stale row", "")])
+        self.write("stray.txt")
+        before = self.read_root_schema()
+        self.check()
+        self.assertEqual(self.read_root_schema(), before)
+
+
 # ---------------------------------------------------------------- robustness
 
 

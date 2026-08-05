@@ -11,8 +11,9 @@ product, not overhead.
 ```bash
 python3 tools/schema_lint.py check .            # validate this package (must stay green)
 python3 tools/schema_lint.py check . --werror   # CI mode: warnings fail too
+python3 tools/schema_lint.py check . --fix      # register strays / prune stale rows, re-check
 python3 tools/schema_lint.py init <repo>        # scaffold an existing repo
-python3 tests/test_schema_lint.py               # scenario test-suite (45 real-world cases)
+python3 tests/test_schema_lint.py               # scenario test-suite (54 real-world cases)
 ```
 
 ## Rules of this repo
