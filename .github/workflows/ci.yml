@@ -8,7 +8,7 @@ jobs:
   lint-and-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Self-validate the pyramid (warnings are errors)
         run: python3 tools/schema_lint.py check . --werror
       - name: Scenario tests — linter
