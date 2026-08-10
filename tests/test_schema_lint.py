@@ -95,6 +95,22 @@ class TestCleanPyramids(ScenarioCase):
         self.write(f"{chain}/leaf.txt")
         self.assertClean(self.check())
 
+    def test_schema_may_register_its_own_contract_file(self):
+        """A schema that documents SCHEMA.md in its own table is not "missing" it.
+
+        Registering the contract file is idiomatic — most seeded SCHEMA.md files
+        open their table with a row for themselves — but SCHEMA.md is in
+        IMPLICIT_ALLOWED, and that branch used to `continue` before the row was
+        matched. The row therefore never got marked seen and a `required` one was
+        reported missing, in the one file the author was most likely to write.
+        """
+        self.schema("", [
+            ("SCHEMA.md", "file", "this contract", "required"),
+            ("payload.txt", "file", "the payload", "required"),
+        ])
+        self.write("payload.txt")
+        self.assertClean(self.check())
+
     def test_empty_directory_with_empty_table(self):
         """A placeholder dir whose schema lists nothing yet."""
         self.schema("", [("inbox/", "dir", "empty for now", "")])
