@@ -192,6 +192,12 @@ def check_dir(dirpath: Path, root: Path, report: Report,
     for child in entries:
         name = child.name
         if name in IMPLICIT_ALLOWED:
+            # Implicitly allowed everywhere, but a schema may still register
+            # it (commonly `| `SCHEMA.md` | file | this contract | required |`)
+            # -- mark that row seen so it is not reported missing.
+            row = _match_row(name, child.is_dir(), doc)
+            if row is not None:
+                row.seen = True
             continue
         if name in ALWAYS_IGNORED:
             # Registering one of these documents it; contents are never
