@@ -18,6 +18,7 @@ coverage: strict
 |---|---|---|---|
 | `schema_lint.py` | file | Validator (`check`, with `--fix` remediation) and scaffolder (`init`) for schema pyramids | required |
 | `schema_bench.py` | file | Context-cost benchmark: schema-chain reads vs tree-dump baseline | required |
+| `schema_dist.py` | file | Distribution integrity: the vendored-surface manifest, package self-consistency, and drift audits of a consumer's copies | required |
 
 ## Placement
 

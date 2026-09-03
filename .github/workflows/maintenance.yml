@@ -1,0 +1,89 @@
+name: maintenance
+
+# The package's own maintenance loop.
+#
+# ci.yml proves that a CHANGE is good; nothing proved that the package is
+# still good when nobody changes it. This repo sat untouched for weeks with no
+# scheduled anything, which is a strange posture for the package that exists
+# to keep other repositories from rotting silently.
+#
+# So: once a week, run the full gate against an untouched tree and report.
+# Green is silent. Red opens (or updates) ONE tracking issue — never a bare
+# push to a protected branch, and never a second issue for a failure that is
+# already filed. The marker below is what makes the run idempotent.
+
+on:
+  schedule:
+    # Mondays 07:13 UTC. Off the hour on purpose: scheduled runs cluster at
+    # :00 across GitHub and get queued behind the crowd.
+    - cron: "13 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maintenance
+  cancel-in-progress: false
+
+env:
+  MARKER: "<!-- schema-maintenance -->"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Pyramid self-validation (warnings are errors)
+        id: lint
+        run: |
+          echo '## Pyramid' >> "$GITHUB_STEP_SUMMARY"
+          python3 tools/schema_lint.py check . --werror 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
+          exit "${PIPESTATUS[0]}"
+
+      - name: Distribution manifest + package self-consistency
+        if: always()
+        id: dist
+        run: |
+          echo '## Distribution' >> "$GITHUB_STEP_SUMMARY"
+          python3 tools/schema_dist.py check . 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
+          exit "${PIPESTATUS[0]}"
+
+      - name: Scenario tests
+        if: always()
+        id: tests
+        run: |
+          python3 tests/test_schema_lint.py
+          python3 tests/test_schema_bench.py
+          python3 tests/test_schema_dist.py
+
+      # A weekly run that only ever says "green" teaches nobody anything, and a
+      # weekly run that opens a fresh issue every Monday teaches people to mute
+      # it. One issue, reopened and updated, is the middle: the failure has a
+      # single address for as long as it lasts.
+      - name: File or refresh the tracking issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          LINT: ${{ steps.lint.outcome }}
+          DIST: ${{ steps.dist.outcome }}
+          TESTS: ${{ steps.tests.outcome }}
+        run: |
+          set -euo pipefail
+          title="maintenance: the weekly audit is failing"
+          body="$(printf '%s\n\n%s\n\n| check | result |\n| --- | --- |\n| pyramid lint (--werror) | %s |\n| distribution + consistency | %s |\n| scenario tests | %s |\n\n[Run log](%s)\n\nThis issue is reused by every failing run and closed by hand once the audit is green again.\n' \
+            "$MARKER" "The scheduled audit of an unchanged tree failed." \
+            "$LINT" "$DIST" "$TESTS" "$RUN_URL")"
+          existing="$(gh issue list --state open --search "$MARKER in:body" \
+                      --json number --jq '.[0].number // empty' || true)"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi

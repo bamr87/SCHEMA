@@ -19,7 +19,7 @@ coverage: strict
 
 | entry | kind | purpose | rules |
 |---|---|---|---|
-| `pre-commit` | file | Runs `schema_lint.py check .` so schema edits ride with the change they describe | required |
+| `pre-commit` | file | Runs `schema_lint.py check .` and `schema_dist.py check .` so schema edits and manifest updates ride with the change they describe | required |
 
 ## Placement
 

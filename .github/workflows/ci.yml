@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
@@ -11,7 +14,15 @@ jobs:
       - uses: actions/checkout@v7
       - name: Self-validate the pyramid (warnings are errors)
         run: python3 tools/schema_lint.py check . --werror
+      # The vendored surface is an interface: this fails when a payload file
+      # changed without DISTRIBUTION.yml being regenerated, and when the
+      # package contradicts itself (spec version drift, a protocol snippet
+      # citing a file that no longer exists).
+      - name: Distribution manifest + package self-consistency
+        run: python3 tools/schema_dist.py check .
       - name: Scenario tests — linter
         run: python3 tests/test_schema_lint.py
       - name: Scenario tests — benchmark
         run: python3 tests/test_schema_bench.py
+      - name: Scenario tests — distribution
+        run: python3 tests/test_schema_dist.py

@@ -1,0 +1,31 @@
+# Dependabot configuration
+#
+# This package has no third-party dependencies by design — `tools/` is
+# stdlib-only Python so adopters can vendor a single file. The one thing here
+# that CAN go stale is the set of actions the workflows call.
+#
+# Fleet policy (bamr87/bamr87 docs/DEPENDENCIES.md) is always-latest, with
+# GitHub Actions as the standing exception: `uses:` needs a ref, so actions
+# ride MAJOR tags (@v7) and minors/patches float within them. Dependabot's job
+# is the majors — the one bump a floating tag can never deliver.
+version: 2
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    groups:
+      # One PR per run, not one per action.
+      github-actions:
+        patterns:
+          - "*"

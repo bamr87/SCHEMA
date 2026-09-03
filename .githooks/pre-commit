@@ -1,5 +1,6 @@
 #!/bin/sh
-# Pyramid Schema pre-commit: every commit leaves the pyramid lint-green.
+# Pyramid Schema pre-commit: every commit leaves the pyramid lint-green and
+# the distribution manifest current.
 # Activate once per clone:  git config core.hooksPath .githooks
 # Emergency bypass:         git commit --no-verify   (CI still enforces)
 #
@@ -11,5 +12,15 @@ python3 tools/schema_lint.py check . || {
     echo "pre-commit: schema_lint failed — the SCHEMA.md files no longer" >&2
     echo "match the tree. Fix the pyramid (schema edits ride with the" >&2
     echo "change), or bypass with --no-verify and let CI catch you." >&2
+    exit 1
+}
+
+# The vendored surface is an interface: editing a payload file without
+# regenerating DISTRIBUTION.yml publishes a hash nobody can match.
+python3 tools/schema_dist.py check . || {
+    echo "" >&2
+    echo "pre-commit: schema_dist failed — the manifest is stale or the" >&2
+    echo "package contradicts itself. 'python3 tools/schema_dist.py check ." >&2
+    echo "--fix' regenerates the manifest; version drift you fix by hand." >&2
     exit 1
 }

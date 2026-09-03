@@ -14,7 +14,11 @@ python3 tools/schema_lint.py check . --werror   # CI mode: warnings fail too
 python3 tools/schema_lint.py check . --fix      # register strays / prune stale rows, re-check
 python3 tools/schema_lint.py check <repo> --federation  # + submodule seam checks (monorepos)
 python3 tools/schema_lint.py init <repo>        # scaffold an existing repo
+python3 tools/schema_dist.py check .            # manifest current + package self-consistent
+python3 tools/schema_dist.py check . --fix      # regenerate DISTRIBUTION.yml after a payload change
+python3 tools/schema_dist.py verify <repo>      # audit a consumer's vendored copies
 python3 tests/test_schema_lint.py               # scenario test-suite (real-world cases)
+python3 tests/test_schema_dist.py               # scenario test-suite (distribution + consistency)
 git config core.hooksPath .githooks             # once per clone: pre-commit lint
 ```
 
@@ -25,6 +29,13 @@ git config core.hooksPath .githooks             # once per clone: pre-commit lin
 - `example/` trees are test fixtures — keep them lint-green and minimal.
 - The root `SCHEMA.md` uses `coverage: strict`: register new root entries in
   its Structure table in the same commit that creates them.
+- `DISTRIBUTION.yml` is generated — never hand-edit it. Change a vendored file
+  (see `PAYLOAD` in `tools/schema_dist.py`) and regenerate it in the same
+  commit; CI fails when the two disagree.
+- The spec version lives in exactly one place — `SPEC_VERSION` in
+  `tools/schema_lint.py`. Bumping it means bumping the spec document, the seed
+  template's frontmatter and every `SCHEMA.md` in the tree together;
+  `schema_dist.py check` is what proves you did.
 
 ## SCHEMA.md protocol (Pyramid Schema)
 
@@ -65,4 +76,10 @@ python3 tools/schema_lint.py check .
 ```
 
 Fix errors. Surface warnings to the user with a one-line explanation each if
-you choose not to fix them.
+you choose not to fix them. Then run:
+
+```
+python3 tools/schema_dist.py check .
+```
+
+so a change to a vendored file leaves with its manifest.
