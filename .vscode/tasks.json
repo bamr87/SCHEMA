@@ -1,0 +1,87 @@
+// SCHEMA · .vscode/tasks.json — fleet-vscode/v1 · 2026-09-09. Convention + vocabulary: .vscode/README.md.
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Lint",
+      "detail": "Host python. Validates this package (must stay green).",
+      "type": "shell",
+      "command": "python3 tools/schema_lint.py check .",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Fix",
+      "detail": "Host python. Registers strays / prunes stale rows, then re-checks.",
+      "type": "shell",
+      "command": "python3 tools/schema_lint.py check . --fix",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Test",
+      "detail": "Host python. The three scenario suites.",
+      "type": "shell",
+      "command": "python3 tests/test_schema_lint.py && python3 tests/test_schema_bench.py && python3 tests/test_schema_dist.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Verify",
+      "detail": "Host python. ci.yml exactly: lint with --werror, the distribution check, then the three suites.",
+      "type": "shell",
+      "command": "python3 tools/schema_lint.py check . --werror && python3 tools/schema_dist.py check . && python3 tests/test_schema_lint.py && python3 tests/test_schema_bench.py && python3 tests/test_schema_dist.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Dist: regenerate",
+      "detail": "Host python. Regenerates DISTRIBUTION.yml after a payload change.",
+      "type": "shell",
+      "command": "python3 tools/schema_dist.py check . --fix",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Setup: hooks",
+      "detail": "Host. Once per clone: the pre-commit lint hook.",
+      "type": "shell",
+      "command": "git config core.hooksPath .githooks",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude: session",
+      "detail": "Interactive Claude Code in this repo with its .claude/agents + skills, on your logged-in credentials. House rules still apply: branch from main, open a PR, a human merges.",
+      "type": "shell",
+      "command": "claude",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      }
+    }
+  ]
+}
