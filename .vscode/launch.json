@@ -1,0 +1,26 @@
+// SCHEMA · .vscode/launch.json — fleet-vscode/v1 · 2026-09-09. Convention + vocabulary: .vscode/README.md.
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: schema_lint check .",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/schema_lint.py",
+      "args": [
+        "check",
+        "."
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug: current python file",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
