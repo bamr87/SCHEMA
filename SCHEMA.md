@@ -30,6 +30,7 @@ coverage: strict
 | `tests/` | dir | Scenario test-suite for the tooling | required |
 | `README.md` | file | Human-facing overview and quickstart | required |
 | `CLAUDE.md` | file | Agent instructions, including the SCHEMA protocol | required |
+| `LICENSE` | file | MIT license text | |
 
 ## Placement
 
