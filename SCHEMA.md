@@ -31,6 +31,7 @@ coverage: strict
 | `README.md` | file | Human-facing overview and quickstart | required |
 | `CLAUDE.md` | file | Agent instructions, including the SCHEMA protocol | required |
 | `LICENSE` | file | MIT license text | |
+| `CHANGELOG.md` | file | Notable changes, in Keep a Changelog format | |
 
 ## Placement
 
