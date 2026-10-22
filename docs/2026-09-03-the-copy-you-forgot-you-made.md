@@ -1,5 +1,7 @@
 # The Copy You Forgot You Made
 
+> Essay: how "this repo has gone quiet" led to a fan-out that could not reach unmounted repos and an upstream copy nobody checked, and why every vendored file needs a content-addressed contract with parity tiers.
+
 *Draft for it-journey. Written after a session that started with "the SCHEMA
 repo hasn't been updated in a while" and ended two pull requests deep in
 somewhere else entirely.*

@@ -1,5 +1,7 @@
 # Pyramid Schema — Effectiveness & Token-Reduction Report
 
+> Measurements, not claims: how the v0.1 package held up against real repository scenarios and three real-repo adoptions, and what schema-chain reads do to an agent's context spend.
+
 **Date:** 2026-07-15 · **Scope:** v0.1 package as of this report's commit
 
 This report answers two questions with measurements, not claims: does the

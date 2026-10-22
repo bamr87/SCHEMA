@@ -1,5 +1,6 @@
 ---
 title: "The Pyramid Schema: SCHEMA.md in Every Directory, and Why Stateless Agents Need Stone Tablets"
+description: "Blog post introducing the Pyramid Schema: a lintable SCHEMA.md in every directory, so stateless AI agents look up where things go instead of guessing."
 date: 2026-07-15
 categories: [ai, tooling, context-engineering]
 tags: [claude-code, agents, schema-md, repo-structure, lint]
