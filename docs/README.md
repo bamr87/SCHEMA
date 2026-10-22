@@ -12,7 +12,7 @@ The specification itself is [`spec/pyramid-schema-spec-v0.1.md`](../spec/pyramid
 | Document | What it covers |
 | --- | --- |
 | [`AGENTS.md`](../AGENTS.md) | The Pyramid Schema package — spec, seed template, agent protocol, linter and fixture repos — and the rules for changing it without breaking the copies adopters vendor. |
-| [`CHANGELOG.md`](../CHANGELOG.md) | Release history, written by release-please from the merged pull request titles. |
+| [`CHANGELOG.md`](../CHANGELOG.md) | Release history: the notable changes in each version, newest first. |
 | [`SCHEMA.md`](../SCHEMA.md) | Distribution package for the Pyramid Schema paradigm: spec, seed template, agent protocol, linter, and schematized example repos. It validates itself. |
 | [`PRD.md`](../PRD.md) | Product requirements for [`bamr87/SCHEMA`](https://github.com/bamr87/SCHEMA). Derived from the README, agent docs, config and code in this repo. Anything not stated in those sources is marked **TBD**; success metrics are proposals. |
 
