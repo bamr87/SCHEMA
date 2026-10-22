@@ -1,0 +1,73 @@
+# =============================================================================
+# features/features.yml — THE FEATURE INDEX for bamr87/SCHEMA
+# =============================================================================
+# kit: verify v0.1.0 · governance v0.1.0 (bamr87/bamr87 templates/verify/, templates/governance/)
+#
+# One entry per user-facing capability, grounded in this repo's PRD, README and
+# code: what it does, where it lives (`link`), where it is explained (`docs`),
+# its `status` (shipped | partial | planned | deprecated | tbd) and the PRD
+# requirements it serves (`prd:`; TBD = not yet traced). Ids are STABLE: never
+# renumber or reuse one. The PRD's "Feature catalog" block is generated from
+# this file — edit here, then run:
+#   python3 <bamr87/bamr87>/tools/governance_lint.py prd-sync . --write
+# Validate: python3 <hub>/tools/governance_lint.py check .  ·  <hub>/tools/features_index.py check .
+# Schema: features/v1 (field reference: bamr87/bamr87 templates/verify/features.template.yml)
+# =============================================================================
+schema: features/v1
+repo: bamr87/SCHEMA
+
+features:
+  - id: SCHEMA-001
+    title: "tools/schema_lint.py"
+    description: "`tools/schema_lint.py` (scaffold/check/fix)"
+    implemented: true
+    status: shipped
+    prd: [TBD]
+    surface: infra
+    link: "tools/schema_lint.py"
+    docs: "README.md"
+  - id: SCHEMA-002
+    title: "Federation checks across submodule seams"
+    description: "Federation checks across submodule seams"
+    implemented: true
+    status: shipped
+    prd: [TBD]
+    surface: infra
+    link: "tools/schema_lint.py"
+    docs: "README.md"
+  - id: SCHEMA-003
+    title: "DISTRIBUTION.yml + tools/schema_dist.py"
+    description: "`DISTRIBUTION.yml` + `tools/schema_dist.py`"
+    implemented: true
+    status: shipped
+    prd: [TBD]
+    surface: infra
+    link: "DISTRIBUTION.yml"
+    docs: "README.md"
+  - id: SCHEMA-004
+    title: "CLAUDE.md protocol snippet"
+    description: "CLAUDE.md protocol snippet (`protocol/`)"
+    implemented: true
+    status: shipped
+    prd: [TBD]
+    surface: infra
+    link: "protocol"
+    docs: "README.md"
+  - id: SCHEMA-005
+    title: "Seed templates and lint-green example fixture repos"
+    description: "Seed templates and lint-green example fixture repos"
+    implemented: true
+    status: shipped
+    prd: [FR2]
+    surface: infra
+    link: "templates/SCHEMA.template.md"
+    docs: "README.md"
+  - id: SCHEMA-006
+    title: "Scenario test suite"
+    description: "Scenario test suite"
+    implemented: true
+    status: shipped
+    prd: [TBD]
+    surface: ui
+    link: "tests/test_schema_lint.py"
+    docs: "README.md"
