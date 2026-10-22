@@ -30,7 +30,8 @@ coverage: strict
 | `tests/` | dir | Scenario test-suite for the tooling | required |
 | `README.md` | file | Human-facing overview and quickstart | required |
 | `PRD.md` | file | Product requirements document (goals, users, features, requirements) | |
-| `CLAUDE.md` | file | Agent instructions, including the SCHEMA protocol | required |
+| `AGENTS.md` | file | Canonical agent instructions: commands, repo rules, and the SCHEMA protocol | required |
+| `CLAUDE.md` | file | Claude Code pointer that imports `AGENTS.md` | required |
 | `LICENSE` | file | MIT license text | |
 | `CHANGELOG.md` | file | Notable changes, in Keep a Changelog format | |
 
