@@ -79,6 +79,8 @@ def build(root: Path, ver: str = "0.1") -> None:
     (root / "README.md").write_text("See `tools/schema_lint.py`.\n", encoding="utf-8")
     (root / "CLAUDE.md").write_text("See `templates/SCHEMA.template.md`.\n",
                                     encoding="utf-8")
+    (root / "AGENTS.md").write_text("Run `tools/schema_lint.py check .`.\n",
+                                    encoding="utf-8")
     (root / sd.MANIFEST_NAME).write_text(sd.render_manifest(root), encoding="utf-8")
 
 
@@ -214,6 +216,15 @@ class TestCitedPaths(Case):
             "```bash\npython3 tools/missing_tool.py check .\n```\n",
             encoding="utf-8")
         self.assertTrue(any("tools/missing_tool.py" in e for e in self.errors()))
+
+    def test_paths_in_agents_file_are_checked(self):
+        # AGENTS.md is the canonical agent file (D4): its commands are what an
+        # agent runs, so a path it cites must exist like one in CLAUDE.md.
+        (self.root / "AGENTS.md").write_text(
+            "```bash\npython3 tools/renamed_away.py check .\n```\n",
+            encoding="utf-8")
+        self.assertTrue(any("AGENTS.md: cites `tools/renamed_away.py`" in e
+                            for e in self.errors()))
 
     def test_foreign_first_segment_is_not_a_path(self):
         # `src/` is not a top-level entry of this package: an illustrative
