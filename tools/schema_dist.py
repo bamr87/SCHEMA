@@ -70,9 +70,11 @@ PAYLOAD: tuple[tuple[str, str, str], ...] = (
 TIERS = {"strict", "text"}
 
 # Documents whose backticked paths are load-bearing instructions to an agent.
+# AGENTS.md is the canonical agent file (fleet decision D4); CLAUDE.md is kept
+# because an adopter-shaped tree may still carry its rules there.
 # docs/ is deliberately excluded: essays cite hypothetical trees, and a
 # rhetorical path is not a broken reference.
-PROSE = ("README.md", "CLAUDE.md", "protocol/CLAUDE.snippet.md")
+PROSE = ("README.md", "AGENTS.md", "CLAUDE.md", "protocol/CLAUDE.snippet.md")
 
 
 # ---------------------------------------------------------------- hashing
