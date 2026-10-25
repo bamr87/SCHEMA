@@ -13,6 +13,8 @@ coverage: listed
 |---|---|---|---|
 | `[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*.md` | pattern | A dated post or report, `YYYY-MM-DD-slug.md` | |
 | `README.md` | file | The docs index: hand prose above a span `tools/docs_index.py --write` generates from each document's summary line | required |
+| `constitution.md` | file | The repo constitution: rules every change satisfies; amended only via `amendments/` (fleet governance kit) | |
+| `amendments/` | dir | Append-only, numbered constitution amendment records (`NNNN-slug.md`), ratified by merged PR | |
 
 ## Placement
 

@@ -25,7 +25,8 @@ coverage: strict
 | `templates/` | dir | Seed templates copied into new directories | required |
 | `protocol/` | dir | Agent-facing protocol text (CLAUDE.md drop-ins) | required |
 | `tools/` | dir | The linter and companion tooling | required |
-| `docs/` | dir | Essays, posts, and reports about the paradigm | |
+| `docs/` | dir | Essays, posts, and reports about the paradigm; also the constitution and its amendment log | |
+| `features/` | dir | Feature catalog `features.yml` (features/v1), linked to PRD.md requirement ids | |
 | `example/` | dir | Fully schematized fixture repos used in docs and tests | required |
 | `tests/` | dir | Scenario test-suite for the tooling | required |
 | `README.md` | file | Human-facing overview and quickstart | required |

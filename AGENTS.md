@@ -90,3 +90,7 @@ Member of the bamr87 fleet, but not a hub submodule: it is the **upstream** of t
 ## Standard deviations
 
 none
+
+## Governance
+
+Read `docs/constitution.md` before changing anything: it is the highest-precedence rule set here and wins over this file when they disagree. It changes only through a numbered record in `docs/amendments/`, ratified by the maintainer merging the PR; agents propose, never merge. Every user-facing feature has a stable id in `features/features.yml` with `status`, location and the PRD requirement ids it serves; the PRD's "Feature catalog" block is generated from it (`python3 <bamr87/bamr87>/tools/governance_lint.py prd-sync . --write`; check with `… check .`). Never hand-edit that block or `CHANGELOG.md`.

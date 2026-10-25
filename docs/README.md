@@ -23,6 +23,8 @@ The specification itself is [`spec/pyramid-schema-spec-v0.1.md`](../spec/pyramid
 | [`docs/2026-07-15-effectiveness-report.md`](2026-07-15-effectiveness-report.md) | Measurements, not claims: how the v0.1 package held up against real repository scenarios and three real-repo adoptions, and what schema-chain reads do to an agent's context spend. |
 | [`docs/2026-07-15-pyramid-schema-schema-md-for-ai-agents.md`](2026-07-15-pyramid-schema-schema-md-for-ai-agents.md) | Blog post introducing the Pyramid Schema: a lintable SCHEMA.md in every directory, so stateless AI agents look up where things go instead of guessing. |
 | [`docs/2026-09-03-the-copy-you-forgot-you-made.md`](2026-09-03-the-copy-you-forgot-you-made.md) | Essay: how "this repo has gone quiet" led to a fan-out that could not reach unmounted repos and an upstream copy nobody checked, and why every vendored file needs a content-addressed contract with parity tiers. |
+| [`docs/constitution.md`](constitution.md) | The rules every change to this repo must satisfy, whoever makes it — a human or an AI agent. Agents read this before [CLAUDE.md](../CLAUDE.md) conventions, the [PRD](../PRD.md), or the [feature catalog](../features/features.yml). Ratified… |
 | [`docs/SCHEMA.md`](SCHEMA.md) | Essays, blog posts, and reports about the paradigm — dated, human-facing writing. |
+| [`docs/amendments/`](amendments/README.md) | The append-only log of changes to [the constitution](constitution.md). |
 
 <!-- AUTO:docs-index:end -->
