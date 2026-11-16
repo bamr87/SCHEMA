@@ -3,7 +3,7 @@
 # SCHEMA — Constitution
 
 > The rules every change to this repo must satisfy, whoever makes it — a human or an AI agent.
-> Agents read this before [CLAUDE.md](../CLAUDE.md) conventions, the [PRD](../PRD.md), or the
+> Agents read this before [AGENTS.md](../AGENTS.md) conventions, the [PRD](../PRD.md), or the
 > [feature catalog](../features/features.yml). Ratified by merged PR; amended only per § 8.
 
 ## 1. Mission
@@ -16,12 +16,12 @@ _Source: [PRD.md](../PRD.md)._
 
 These rules are lifted from the repo's own agent guide; breaking one is grounds to reject a PR.
 
-- `tools/` is stdlib-only Python 3.10+; adopters vendor single files. _(CLAUDE.md)_
-- `spec/` versions are frozen once released; changes go in a new version file. _(CLAUDE.md)_
-- `example/` trees are test fixtures — keep them lint-green and minimal. _(CLAUDE.md)_
-- The root `SCHEMA.md` uses `coverage: strict`: register new root entries in its Structure table in the same commit that creates them. _(CLAUDE.md)_
-- `DISTRIBUTION.yml` is generated — never hand-edit it. _(CLAUDE.md)_
-- The spec version lives in exactly one place — `SPEC_VERSION` in `tools/schema_lint.py`. _(CLAUDE.md)_
+- `tools/` is stdlib-only Python 3.10+; adopters vendor single files. _(AGENTS.md)_
+- `spec/` versions are frozen once released; changes go in a new version file. _(AGENTS.md)_
+- `example/` trees are test fixtures — keep them lint-green and minimal. _(AGENTS.md)_
+- The root `SCHEMA.md` uses `coverage: strict`: register new root entries in its Structure table in the same commit that creates them. _(AGENTS.md)_
+- `DISTRIBUTION.yml` is generated — never hand-edit it. _(AGENTS.md)_
+- The spec version lives in exactly one place — `SPEC_VERSION` in `tools/schema_lint.py`. _(AGENTS.md)_
 - Secrets (tokens, API keys) are never printed, logged or committed. _(fleet rule)_
 - `CHANGELOG.md`, when present, is not hand-edited once release-please owns it. _(fleet rule)_
 
@@ -30,7 +30,7 @@ These rules are lifted from the repo's own agent guide; breaking one is grounds 
 When two documents disagree, the higher one wins and the lower one is fixed in the same PR:
 
 1. This constitution (and its ratified amendments in [docs/amendments/](amendments/))
-2. [CLAUDE.md](../CLAUDE.md) — how to work here (commands, conventions, Definition of Done)
+2. [AGENTS.md](../AGENTS.md) — how to work here (commands, conventions, Definition of Done); [CLAUDE.md](../CLAUDE.md) is only a pointer that imports it
 3. The PRD ([`PRD.md`](../PRD.md)) — what the product must do (requirement ids `FRn` / `NFRn`)
 4. [features/features.yml](../features/features.yml) — what it does today (stable feature ids)
 5. ADRs in `docs/adr/` (none yet) and specs — why and how a specific change was made
@@ -68,15 +68,13 @@ When two documents disagree, the higher one wins and the lower one is fixed in t
 
 ## 7. Quality gates
 
-Every PR passes the checks the repo's guide names:
+Every PR passes the gate `.github/workflows/ci.yml` runs (the same commands [AGENTS.md](../AGENTS.md) names):
 
-- `python3 tools/schema_lint.py check .` _(CLAUDE.md)_
-- `python3 tools/schema_lint.py check . --werror` _(CLAUDE.md)_
-- `python3 tools/schema_lint.py check . --fix` _(CLAUDE.md)_
-- `python3 tools/schema_lint.py check <repo> --federation` _(CLAUDE.md)_
-- `python3 tools/schema_lint.py init <repo>` _(CLAUDE.md)_
-- `python3 tools/schema_dist.py check .` _(CLAUDE.md)_
-- `python3 <bamr87/bamr87>/tools/governance_lint.py check .` (feature catalog ↔ PRD, constitution, amendments)
+- `python3 tools/schema_lint.py check . --werror`
+- `python3 tools/schema_dist.py check .`
+- `python3 tests/test_schema_lint.py`, `python3 tests/test_schema_bench.py` and `python3 tests/test_schema_dist.py`
+
+Recommended before opening a PR that touches the constitution, PRD, feature catalog or amendments (not a CI job here): `python3 <bamr87/bamr87>/tools/governance_lint.py check .`. The other `schema_lint.py` modes (`--fix`, `--federation`, `init`) are tools, not gates.
 
 ## 8. Amendments
 

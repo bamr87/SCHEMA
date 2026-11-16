@@ -43,19 +43,27 @@ Every user-facing capability has a stable id in the feature catalog [`features/f
 
 | ID | Feature | Status | Where | Requirements |
 | --- | --- | --- | --- | --- |
-| [SCHEMA-001](features/features.yml) | tools/schema_lint.py | shipped | [`tools/schema_lint.py`](tools/schema_lint.py) · [`README.md`](README.md) | TBD |
-| [SCHEMA-002](features/features.yml) | Federation checks across submodule seams | shipped | [`tools/schema_lint.py`](tools/schema_lint.py) · [`README.md`](README.md) | TBD |
-| [SCHEMA-003](features/features.yml) | DISTRIBUTION.yml + tools/schema_dist.py | shipped | [`DISTRIBUTION.yml`](DISTRIBUTION.yml) · [`README.md`](README.md) | TBD |
-| [SCHEMA-004](features/features.yml) | CLAUDE.md protocol snippet | shipped | [`protocol`](protocol) · [`README.md`](README.md) | TBD |
+| [SCHEMA-001](features/features.yml) | tools/schema_lint.py | shipped | [`tools/schema_lint.py`](tools/schema_lint.py) · [`README.md`](README.md) | FR1 |
+| [SCHEMA-002](features/features.yml) | Federation checks across submodule seams | shipped | [`tools/schema_lint.py`](tools/schema_lint.py) · [`README.md`](README.md) | FR3 |
+| [SCHEMA-003](features/features.yml) | DISTRIBUTION.yml + tools/schema_dist.py | shipped | [`DISTRIBUTION.yml`](DISTRIBUTION.yml) · [`README.md`](README.md) | FR4 |
+| [SCHEMA-004](features/features.yml) | CLAUDE.md protocol snippet | shipped | [`protocol`](protocol) · [`README.md`](README.md) | FR5 |
 | [SCHEMA-005](features/features.yml) | Seed templates and lint-green example fixture repos | shipped | [`templates/SCHEMA.template.md`](templates/SCHEMA.template.md) · [`README.md`](README.md) | FR2 |
-| [SCHEMA-006](features/features.yml) | Scenario test suite | shipped | [`tests/test_schema_lint.py`](tests/test_schema_lint.py) · [`README.md`](README.md) | TBD |
+| [SCHEMA-006](features/features.yml) | Scenario test suite | shipped | [`tests/test_schema_lint.py`](tests/test_schema_lint.py) · [`README.md`](README.md) | FR1, FR2, NFR3 |
+| [SCHEMA-007](features/features.yml) | schema_lint check --json | planned | [`tools/schema_lint.py`](tools/schema_lint.py) · [`README.md`](README.md) | FR6 |
+| [SCHEMA-008](features/features.yml) | AGENTS.md protocol snippet | planned | [`protocol`](protocol) · [`README.md`](README.md) | FR7 |
 
 **Requirement → feature trace**
 
 | Requirement | Features |
 | --- | --- |
-| TBD | SCHEMA-001, SCHEMA-002, SCHEMA-003, SCHEMA-004, SCHEMA-006 |
-| FR2 | SCHEMA-005 |
+| FR1 | SCHEMA-001, SCHEMA-006 |
+| FR3 | SCHEMA-002 |
+| FR4 | SCHEMA-003 |
+| FR5 | SCHEMA-004 |
+| FR2 | SCHEMA-005, SCHEMA-006 |
+| NFR3 | SCHEMA-006 |
+| FR6 | SCHEMA-007 |
+| FR7 | SCHEMA-008 |
 <!-- features:end -->
 
 ## 5. Requirements
@@ -64,11 +72,17 @@ Every user-facing capability has a stable id in the feature catalog [`features/f
 
 - FR1: Every listed path in a SCHEMA table must exist and every unlisted path is flagged
 - FR2: Fixtures under `example/` stay lint-green
+- FR3: `check <repo> --federation` verifies each submodule seam (the mount is a `terminal` row in its parent's `SCHEMA.md`, and the child carries its own root `SCHEMA.md` at the expected spec version) without linting child interiors
+- FR4: `DISTRIBUTION.yml` is a content-addressed manifest of every vendored file; `schema_dist.py check` fails when it is stale or the package contradicts itself, and `verify <repo>` audits a consumer's copies
+- FR5: The package ships the agent protocol text adopters paste into their agent instructions file (`protocol/CLAUDE.snippet.md`)
+- FR6 (planned, #16): `schema_lint.py check --json` emits one JSON object (`errors`, `warnings`, `passed`) to stdout and nothing else, with today's exit codes
+- FR7 (planned, #18): the distribution payload includes a protocol snippet suitable for pasting into `AGENTS.md`
 
 **Non-functional**
 
-- NFR1: Python tooling with no heavy dependencies: TBD
+- NFR1: `tools/` is stdlib-only Python 3.10+, so adopters can vendor single files without installing anything
 - NFR2: Spec changes are versioned
+- NFR3: Linter and distribution behaviour is covered by stdlib-only scenario test suites that CI runs on every change
 
 ## 6. Success metrics (proposed — not defined in sources)
 
@@ -81,4 +95,4 @@ Every user-facing capability has a stable id in the feature catalog [`features/f
 
 ## 8. Links
 
-- [README.md](README.md) · [CLAUDE.md](CLAUDE.md) · [SCHEMA.md](SCHEMA.md) · [CHANGELOG.md](CHANGELOG.md)
+- [README.md](README.md) · [AGENTS.md](AGENTS.md) · [CLAUDE.md](CLAUDE.md) · [SCHEMA.md](SCHEMA.md) · [CHANGELOG.md](CHANGELOG.md)
