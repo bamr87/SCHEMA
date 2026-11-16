@@ -2,7 +2,7 @@
 
 # SCHEMA
 
-> The Pyramid Schema package — spec, seed template, agent protocol, linter and fixture repos — and the rules for changing it without breaking the copies adopters vendor.
+> Pyramid Schema's direction is to become the ultimate open home for all things repository structure: data, tools, resources and transparency, with a SCHEMA.md protocol and linter so agents look up structure instead of guessing, for everyone ([constitution](docs/constitution.md) §1).
 
 ## What this repo is
 
