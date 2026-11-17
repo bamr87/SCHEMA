@@ -1,6 +1,6 @@
 # Pyramid Schema (SCHEMA.md)
 
-> Pyramid Schema: the SCHEMA.md protocol and linter that let AI agents look up repo structure instead of guessing it.
+> Pyramid Schema's direction is to become the ultimate open home for all things repository structure: data, tools, resources and transparency, with a SCHEMA.md protocol and linter so agents look up structure instead of guessing, for everyone ([constitution](docs/constitution.md) §1).
 
 [![CI](https://github.com/bamr87/SCHEMA/actions/workflows/ci.yml/badge.svg)](https://github.com/bamr87/SCHEMA/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/bamr87/SCHEMA)](LICENSE)
 
