@@ -5,7 +5,7 @@
 - **Date:** 2026-11-16
 - **Proposed by:** agent (Platform Architect, Grok Bot), from the day-18 SCHEMA deep-dive (bamr87/bamr87 `_data/deep-dive.yml`)
 - **Ratified by:** (leave blank until merged)
-- **Affects:** constitution summary line, § 2 (source tags), § 3 item 2, § 7; PRD FR1, FR3–FR7, NFR1, NFR3; features SCHEMA-001…SCHEMA-008
+- **Affects:** constitution summary line, § 2 (source tags), § 3 item 2, § 7; PRD FR1, FR3–FR7, NFR1, NFR3; features SCHEMA-001…SCHEMA-006, SCHEMA-008, SCHEMA-009
 - **Supersedes:** none
 - **Related:** [AGENTS.md](../../AGENTS.md), [CLAUDE.md](../../CLAUDE.md), [.github/workflows/ci.yml](../../.github/workflows/ci.yml), #15, #16, #17, #18
 
@@ -37,4 +37,4 @@ Replace the body of § 7 with:
 
 ## Consequences
 
-No linter behaviour changes and `SPEC_VERSION` is unchanged. The PRD gains FR3–FR5 for the shipped federation, distribution and protocol-snippet features, NFR1 is written instead of `TBD`, and NFR3 covers the scenario test suites. FR6 (#16, `check --json`) and FR7 (an AGENTS.md protocol snippet) are recorded as planned, with catalog entries SCHEMA-007 and SCHEMA-008 at `status: planned`. The PRD feature block is regenerated with `governance_lint.py prd-sync`, never hand-edited. Merging this PR ratifies the amendment; an agent never merges it.
+No linter behaviour changes and `SPEC_VERSION` is unchanged. The PRD gains FR3–FR5 for the shipped federation, distribution and protocol-snippet features, NFR1 is written instead of `TBD`, and NFR3 covers the scenario test suites. FR6 (#16, `check --json`) and FR7 (an AGENTS.md protocol snippet) are recorded as planned, with catalog entries SCHEMA-008 and SCHEMA-009 at `status: planned`. The PRD feature block is regenerated with `governance_lint.py prd-sync`, never hand-edited. Merging this PR ratifies the amendment; an agent never merges it.

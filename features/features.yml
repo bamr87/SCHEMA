@@ -72,6 +72,14 @@ features:
     link: "tests/test_schema_lint.py"
     docs: "README.md"
   - id: SCHEMA-007
+    title: "Missions in constitution §1"
+    description: "Three product missions under one direction statement, ratified through amendment 0003."
+    implemented: false
+    status: planned
+    prd: ["§1.1"]
+    surface: docs
+    docs: "docs/constitution.md"
+  - id: SCHEMA-008
     title: "schema_lint check --json"
     description: "Machine-readable `check` output for fleet automation (issue #16)."
     implemented: false
@@ -80,7 +88,7 @@ features:
     surface: cli
     link: "tools/schema_lint.py"
     docs: "README.md"
-  - id: SCHEMA-008
+  - id: SCHEMA-009
     title: "AGENTS.md protocol snippet"
     description: "Vendorable protocol drop-in for AGENTS.md, alongside `protocol/CLAUDE.snippet.md` (issue #18)."
     implemented: false

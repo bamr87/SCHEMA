@@ -8,6 +8,17 @@
 
 Pyramid Schema defines the `SCHEMA.md` protocol and linter that let AI agents look up repository structure instead of guessing it. A `SCHEMA.md` in every directory records a structure table and placement/forbidden rules, making structure local, cheap and verifiable.
 
+
+## 1.1 Missions
+
+Pyramid Schema's direction is to become the ultimate open home for all things repository structure — data, tools, resources and transparency, gathered in one place that anyone can inspect and reuse.
+
+1. **Provide data, tools, resources and transparency for all stakeholders, software practitioners, agent builders and the general public.** Repo maintainers, monorepo owners, AI coding agents, and the general public are first-class audiences. The aim is a shared, open commons: the same sources, the same tools, and the same trail of evidence for everyone.
+2. **Make repository structure local, cheap, queryable and verifiable, so agents look it up instead of guessing.** A `SCHEMA.md` in every directory records a structure table and placement/forbidden rules; a linter scaffolds, checks and auto-fixes the pyramid.
+3. **Put that protocol and linter in every builder's hands.** Serve it through a versioned spec, a seed template and a distribution contract so adopters can vendor copies without drift — an open toolkit for working with all things repository structure.
+
+These missions set the course; they do not claim the work is finished. They serve the PRD goals in §3: a versioned specification, a linter, and a content-addressed distribution contract. The earlier mission paragraph is absorbed into these three. Every feature must trace to them.
+
 ## 2. Target users
 
 - Repo maintainers adopting agent-friendly structure docs
@@ -49,8 +60,9 @@ Every user-facing capability has a stable id in the feature catalog [`features/f
 | [SCHEMA-004](features/features.yml) | CLAUDE.md protocol snippet | shipped | [`protocol`](protocol) · [`README.md`](README.md) | FR5 |
 | [SCHEMA-005](features/features.yml) | Seed templates and lint-green example fixture repos | shipped | [`templates/SCHEMA.template.md`](templates/SCHEMA.template.md) · [`README.md`](README.md) | FR2 |
 | [SCHEMA-006](features/features.yml) | Scenario test suite | shipped | [`tests/test_schema_lint.py`](tests/test_schema_lint.py) · [`README.md`](README.md) | FR1, FR2, NFR3 |
-| [SCHEMA-007](features/features.yml) | schema_lint check --json | planned | [`tools/schema_lint.py`](tools/schema_lint.py) · [`README.md`](README.md) | FR6 |
-| [SCHEMA-008](features/features.yml) | AGENTS.md protocol snippet | planned | [`protocol`](protocol) · [`README.md`](README.md) | FR7 |
+| [SCHEMA-007](features/features.yml) | Missions in constitution §1 | planned | [`docs/constitution.md`](docs/constitution.md) | §1.1 |
+| [SCHEMA-008](features/features.yml) | schema_lint check --json | planned | [`tools/schema_lint.py`](tools/schema_lint.py) · [`README.md`](README.md) | FR6 |
+| [SCHEMA-009](features/features.yml) | AGENTS.md protocol snippet | planned | [`protocol`](protocol) · [`README.md`](README.md) | FR7 |
 
 **Requirement → feature trace**
 
@@ -62,8 +74,9 @@ Every user-facing capability has a stable id in the feature catalog [`features/f
 | FR5 | SCHEMA-004 |
 | FR2 | SCHEMA-005, SCHEMA-006 |
 | NFR3 | SCHEMA-006 |
-| FR6 | SCHEMA-007 |
-| FR7 | SCHEMA-008 |
+| FR6 | SCHEMA-008 |
+| FR7 | SCHEMA-009 |
+| §1.1 | SCHEMA-007 |
 <!-- features:end -->
 
 ## 5. Requirements
