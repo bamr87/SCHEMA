@@ -22,7 +22,7 @@ features:
     description: "`tools/schema_lint.py` (scaffold/check/fix)"
     implemented: true
     status: shipped
-    prd: [TBD]
+    prd: [FR1]
     surface: infra
     link: "tools/schema_lint.py"
     docs: "README.md"
@@ -31,7 +31,7 @@ features:
     description: "Federation checks across submodule seams"
     implemented: true
     status: shipped
-    prd: [TBD]
+    prd: [FR3]
     surface: infra
     link: "tools/schema_lint.py"
     docs: "README.md"
@@ -40,7 +40,7 @@ features:
     description: "`DISTRIBUTION.yml` + `tools/schema_dist.py`"
     implemented: true
     status: shipped
-    prd: [TBD]
+    prd: [FR4]
     surface: infra
     link: "DISTRIBUTION.yml"
     docs: "README.md"
@@ -49,7 +49,7 @@ features:
     description: "CLAUDE.md protocol snippet (`protocol/`)"
     implemented: true
     status: shipped
-    prd: [TBD]
+    prd: [FR5]
     surface: infra
     link: "protocol"
     docs: "README.md"
@@ -67,8 +67,8 @@ features:
     description: "Scenario test suite"
     implemented: true
     status: shipped
-    prd: [TBD]
-    surface: ui
+    prd: [FR1, FR2, NFR3]
+    surface: infra
     link: "tests/test_schema_lint.py"
     docs: "README.md"
   - id: SCHEMA-007
@@ -79,3 +79,21 @@ features:
     prd: ["§1.1"]
     surface: docs
     docs: "docs/constitution.md"
+  - id: SCHEMA-008
+    title: "schema_lint check --json"
+    description: "Machine-readable `check` output for fleet automation (issue #16)."
+    implemented: false
+    status: planned
+    prd: [FR6]
+    surface: cli
+    link: "tools/schema_lint.py"
+    docs: "README.md"
+  - id: SCHEMA-009
+    title: "AGENTS.md protocol snippet"
+    description: "Vendorable protocol drop-in for AGENTS.md, alongside `protocol/CLAUDE.snippet.md` (issue #18)."
+    implemented: false
+    status: planned
+    prd: [FR7]
+    surface: infra
+    link: "protocol"
+    docs: "README.md"
