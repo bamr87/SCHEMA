@@ -299,6 +299,70 @@ class TestVerify(Case):
     def test_non_directory_consumer_is_a_usage_error(self):
         self.assertEqual(self.run_verify(self.root / "README.md"), 2)
 
+    def _full_consumer(self) -> Path:
+        """A consumer holding byte-identical copies of the whole payload."""
+        return self._consumer(**{
+            Path(rel).name: (self.root / rel).read_text()
+            for rel, _tier, _why in sd.PAYLOAD})
+
+    def test_absent_payload_is_counted_by_default(self):
+        c = self.dir / "empty"
+        c.mkdir()
+        code, out = run_cli("verify", str(c), "--root", str(self.root))
+        self.assertEqual(code, 0)
+        last = out.strip().splitlines()[-1]
+        self.assertIn(f"{len(sd.PAYLOAD)} absent", last)
+        self.assertTrue(last.startswith("PASS"), last)
+
+    def test_require_all_fails_on_absent_payload(self):
+        c = self.dir / "empty"
+        c.mkdir()
+        code, out = run_cli("verify", str(c), "--root", str(self.root),
+                            "--require-all")
+        self.assertEqual(code, 1)
+        self.assertTrue(out.strip().splitlines()[-1].startswith("FAIL"), out)
+
+    def test_require_all_fails_on_one_missing_file(self):
+        c = self._consumer(**{
+            "schema_lint.py": (self.root / "tools" / "schema_lint.py").read_text()})
+        code, _out = run_cli("verify", str(c), "--root", str(self.root),
+                             "--require-all")
+        self.assertEqual(code, 1)
+
+    def test_require_all_passes_with_full_identical_payload(self):
+        c = self._full_consumer()
+        code, out = run_cli("verify", str(c), "--root", str(self.root),
+                            "--require-all")
+        self.assertEqual(code, 0, out)
+        self.assertIn("0 absent", out.strip().splitlines()[-1])
+
+    def test_copies_under_vendor_dirs_are_ignored(self):
+        # node_modules/ and .git/ hold packages and objects, not vendored
+        # copies: a fork there is not drift, and is not a copy either.
+        c = self._full_consumer()
+        for skip in ("node_modules/pkg", ".git/x"):
+            (c / skip).mkdir(parents=True)
+            (c / skip / "schema_lint.py").write_text("# fork\n")
+        code, out = run_cli("verify", str(c), "--root", str(self.root),
+                            "--require-all")
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("node_modules", out)
+        empty = self.dir / "only-vendor-dirs"
+        (empty / "node_modules").mkdir(parents=True)
+        (empty / "node_modules" / "schema_lint.py").write_text("# fork\n")
+        code, out = run_cli("verify", str(empty), "--root", str(self.root),
+                            "--require-all")
+        self.assertEqual(code, 1, out)
+        self.assertIn("absent   tools/schema_lint.py", out)
+
+    def test_consumer_path_containing_dot_git_is_still_scanned(self):
+        # The skip is by path part relative to the consumer, not a substring
+        # of the absolute path.
+        c = self.dir / "work.git" / "consumer"
+        (c / "vendor").mkdir(parents=True)
+        (c / "vendor" / "schema_lint.py").write_text("# fork\n")
+        self.assertEqual(self.run_verify(c), 1)
+
 
 class TestNormalization(unittest.TestCase):
     def test_whitespace_is_removed_not_collapsed(self):
