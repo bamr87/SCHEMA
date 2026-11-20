@@ -7,6 +7,11 @@ All notable changes to this project are documented in this file. The format is b
 ### Added
 
 - `CHANGELOG.md`, in Keep a Changelog format.
+- `schema_dist.py verify --require-all`: fail when a payload file has no copy in the consumer ([#15](https://github.com/bamr87/SCHEMA/issues/15)).
+
+### Fixed
+
+- `schema_dist.py verify` now counts and reports `absent` payload files in its verdict line, and skips copies under `.git/` and `node_modules/` by path part instead of a substring of the absolute path ([#15](https://github.com/bamr87/SCHEMA/issues/15)).
 
 ## History
 
