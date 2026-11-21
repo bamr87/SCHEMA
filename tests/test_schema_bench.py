@@ -89,5 +89,16 @@ class TestSurvey(unittest.TestCase):
         self.assertIn("no root SCHEMA.md", buf.getvalue())
 
 
+class TestVersionFlag(unittest.TestCase):
+    """`--version` prints the spec version and exits 0, no repo argument needed."""
+
+    def test_version_flag(self):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf), self.assertRaises(SystemExit) as cm:
+            schema_bench.main(["--version"])
+        self.assertEqual(cm.exception.code, 0)
+        self.assertIn(f"spec {schema_bench.SPEC_VERSION}", buf.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -795,5 +795,17 @@ class TestFederation(ScenarioCase):
         self.assertEqual(entries[0]["update"], "merge")
 
 
+class TestVersionFlag(unittest.TestCase):
+    """`--version` prints the implemented spec and exits 0, no subcommand needed."""
+
+    def test_version_flag(self):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf), self.assertRaises(SystemExit) as cm:
+            schema_lint.main(["--version"])
+        self.assertEqual(cm.exception.code, 0)
+        self.assertIn(f"spec {schema_lint.SPEC_VERSION}", buf.getvalue())
+        self.assertIn("0.1", buf.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

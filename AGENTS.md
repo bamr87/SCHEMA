@@ -13,6 +13,7 @@ This package **is** the Pyramid Schema paradigm: the spec (`spec/`), the seed te
 Stdlib-only Python 3.10+; nothing to install.
 
 ```bash
+python3 tools/schema_lint.py --version         # print the spec version the linter implements
 python3 tools/schema_lint.py check .            # validate this package (must stay green)
 python3 tools/schema_lint.py check . --werror   # CI mode: warnings fail too
 python3 tools/schema_lint.py check . --fix      # register strays / prune stale rows, re-check
