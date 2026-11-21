@@ -328,5 +328,17 @@ class TestSelf(unittest.TestCase):
                          f"`python3 tools/schema_dist.py check . --fix`")
 
 
+class TestVersionFlag(unittest.TestCase):
+    """`--version` prints the package's spec version and exits 0."""
+
+    def test_version_flag(self):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf), self.assertRaises(SystemExit) as cm:
+            sd.main(["--version"])
+        self.assertEqual(cm.exception.code, 0)
+        root = Path(__file__).resolve().parent.parent
+        self.assertIn(f"spec {sd.spec_version(root)}", buf.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

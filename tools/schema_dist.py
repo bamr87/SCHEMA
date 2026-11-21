@@ -340,6 +340,9 @@ def cmd_verify(root: Path, consumer: Path) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="schema_dist", description=__doc__.splitlines()[0])
+    ver = spec_version(Path(__file__).resolve().parent.parent) or "unknown"
+    parser.add_argument("--version", action="version",
+                        version=f"%(prog)s spec {ver}")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_check = sub.add_parser("check", help="manifest current + package self-consistent")

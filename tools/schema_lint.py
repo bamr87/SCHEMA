@@ -520,6 +520,8 @@ def init_tree(root: Path) -> list[Path]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="schema_lint",
                                      description=__doc__.splitlines()[0])
+    parser.add_argument("--version", action="version",
+                        version=f"%(prog)s spec {SPEC_VERSION}")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_check = sub.add_parser("check", help="validate a schema pyramid")
