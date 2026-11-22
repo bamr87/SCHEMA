@@ -39,6 +39,7 @@ Usage:
     python3 tools/schema_dist.py check [path]        manifest current + package self-consistent
     python3 tools/schema_dist.py check [path] --fix  rewrite DISTRIBUTION.yml, then re-check
     python3 tools/schema_dist.py verify <dir>        audit a consumer's vendored copies
+    python3 tools/schema_dist.py verify <dir> --require-all   ... and fail if any is absent
     python3 tools/schema_dist.py show [path]         print the manifest to stdout
 
 Stdlib only, Python 3.10+ — same contract as the linter it ships beside.
@@ -294,18 +295,28 @@ def cmd_check(root: Path, fix: bool) -> int:
     return 1 if errors else 0
 
 
-def cmd_verify(root: Path, consumer: Path) -> int:
+SKIP_DIRS = frozenset({".git", "node_modules"})
+
+
+def cmd_verify(root: Path, consumer: Path, require_all: bool = False) -> int:
     """Audit every copy of the payload found under `consumer`.
 
     Located by basename, not by path: consumers re-home what they vendor
     (the bamr87 hub keeps the snippet at templates/schema/CLAUDE.snippet.md),
-    and a copy that moved is still a copy that can drift.
+    and a copy that moved is still a copy that can drift. Copies under
+    `.git/` or `node_modules/` (relative to the consumer) are not vendored
+    copies and are skipped.
+
+    A payload file with no copy at all is counted as `absent` and always
+    reported; it fails the run only under `require_all`, for consumers that
+    are meant to hold the whole payload.
     """
     if not consumer.is_dir():
         print(f"error: not a directory: {consumer}", file=sys.stderr)
         return 2
 
     drift = 0
+    absent = 0
     for rel, tier, _why in sorted(PAYLOAD):
         src = root / rel
         if not src.is_file():
@@ -314,9 +325,11 @@ def cmd_verify(root: Path, consumer: Path) -> int:
             continue
         raw, text, _size = digests(src)
         copies = [p for p in consumer.rglob(Path(rel).name)
-                  if p.is_file() and ".git/" not in str(p)]
+                  if p.is_file()
+                  and not SKIP_DIRS.intersection(p.relative_to(consumer).parts)]
         if not copies:
             print(f"absent   {rel}: no copy under {consumer}")
+            absent += 1
             continue
         for copy in sorted(copies):
             c_raw, c_text, _ = digests(copy)
@@ -332,9 +345,11 @@ def cmd_verify(root: Path, consumer: Path) -> int:
                 print(f"DRIFT    {shown}: not byte-identical to {rel} (parity: strict)")
                 drift += 1
 
-    verdict = "FAIL" if drift else "PASS"
-    print(f"\n{verdict}: {drift} drifted copy/copies")
-    return 1 if drift else 0
+    failed = drift or (require_all and absent)
+    verdict = "FAIL" if failed else "PASS"
+    print(f"\n{verdict}: {drift} drifted copy/copies, {absent} absent"
+          + (" (--require-all)" if require_all else ""))
+    return 1 if failed else 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -350,6 +365,8 @@ def main(argv: list[str] | None = None) -> int:
     p_verify = sub.add_parser("verify", help="audit a consumer's vendored copies")
     p_verify.add_argument("consumer")
     p_verify.add_argument("--root", default=".", help="this package (default: .)")
+    p_verify.add_argument("--require-all", action="store_true",
+                          help="fail when any payload file has no copy in the consumer")
 
     p_show = sub.add_parser("show", help=f"print {MANIFEST_NAME} to stdout")
     p_show.add_argument("path", nargs="?", default=".")
@@ -368,7 +385,7 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write(render_manifest(root))
         return 0
     if args.command == "verify":
-        return cmd_verify(root, Path(args.consumer).resolve())
+        return cmd_verify(root, Path(args.consumer).resolve(), args.require_all)
     return cmd_check(root, args.fix)
 
 
