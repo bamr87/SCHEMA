@@ -8,6 +8,11 @@ All notable changes to this project are documented in this file. The format is b
 
 - `CHANGELOG.md`, in Keep a Changelog format.
 - `--version` on `tools/schema_lint.py`, `tools/schema_dist.py` and `tools/schema_bench.py`: prints the Pyramid Schema spec version the tool implements and exits 0 ([#21](https://github.com/bamr87/SCHEMA/issues/21)).
+- `schema_dist.py verify --require-all`: fail when a payload file has no copy in the consumer ([#15](https://github.com/bamr87/SCHEMA/issues/15)).
+
+### Fixed
+
+- `schema_dist.py verify` now counts and reports `absent` payload files in its verdict line, and skips copies under `.git/` and `node_modules/` by path part instead of a substring of the absolute path ([#15](https://github.com/bamr87/SCHEMA/issues/15)).
 
 ## History
 

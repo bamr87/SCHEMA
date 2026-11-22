@@ -30,6 +30,7 @@ python3 tools/schema_lint.py init <repo>        # scaffold an existing repo
 python3 tools/schema_dist.py check .            # manifest current + package self-consistent
 python3 tools/schema_dist.py check . --fix      # regenerate DISTRIBUTION.yml after a payload change
 python3 tools/schema_dist.py verify <repo>      # audit a consumer's vendored copies
+python3 tools/schema_dist.py verify <repo> --require-all  # ... and fail if any payload file is absent
 python3 tests/test_schema_lint.py               # scenario test-suite (real-world cases)
 python3 tests/test_schema_dist.py               # scenario test-suite (distribution + consistency)
 python3 tests/test_schema_bench.py              # scenario test-suite (context-cost benchmark)
@@ -42,7 +43,7 @@ Then paste `protocol/CLAUDE.snippet.md` into your repo's `CLAUDE.md`, add the `c
 
 Adopters do not install this package, they copy files out of it. That makes those files an interface, and `DISTRIBUTION.yml` describes it: a content-addressed manifest naming each vendored file, what it hashes to, and how strictly a copy must match.
 
-`schema_dist.py check .` proves the package is internally consistent and the manifest current, `check . --fix` regenerates the manifest after a vendored file changes, and `verify <repo>` audits every copy a consumer holds, wherever it re-homed them (commands in [Quick start](#quick-start)).
+`schema_dist.py check .` proves the package is internally consistent and the manifest current, `check . --fix` regenerates the manifest after a vendored file changes, and `verify <repo>` audits every copy a consumer holds, wherever it re-homed them (commands in [Quick start](#quick-start)). `verify` skips anything under `.git/` or `node_modules/`, and reports each payload file with no copy as `absent`; that passes by default, because a consumer may vendor only part of the payload, while `--require-all` fails the run for a consumer meant to hold all of it.
 
 Two parity tiers, because not all drift is the same. `tools/schema_lint.py` is **strict**: a copy must be byte-identical, because a drifted linter means that repo is passing a *different gate* from everyone else while still reporting green. The template and the protocol snippet are **text**: a consumer may reflow, re-tabulate and requote them to its own house style, and the manifest carries a layout-blind hash so only a real edit registers as drift.
 
