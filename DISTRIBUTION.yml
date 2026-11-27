@@ -31,7 +31,7 @@ payload:
     purpose: the seed template every new directory's SCHEMA.md is filled in from
   - path: tools/schema_lint.py
     parity: strict
-    bytes: 23151
-    sha256: c63c47cc737ca3d5712f48c405cb1816bb13382efac7600f347e71c67abf628f
-    sha256_text: 22789f242e43c7c2e852d3f807060ef1d495372762e91cdbda2bf3f496623415
+    bytes: 23271
+    sha256: db089acbfe541a818db7bd89eac2024774f0f4a24d30c2a081f93e109d606050
+    sha256_text: d42a3474140558daf6f76d1193a59d3a0c890087f270d480d7c2656ffb68f162
     purpose: the validator adopters run in CI; a drifted copy is a different gate

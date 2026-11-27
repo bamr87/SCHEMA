@@ -33,8 +33,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from schema_lint import (ALWAYS_IGNORED, Report, is_repo_boundary,  # noqa: E402
-                         parse_schema)
+from schema_lint import (ALWAYS_IGNORED, SPEC_VERSION, Report,  # noqa: E402
+                         is_repo_boundary, parse_schema)
 
 
 def tokens(text: str) -> int:
@@ -142,6 +142,8 @@ def render(r: dict) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="schema_bench", description=__doc__.splitlines()[0])
+    parser.add_argument("--version", action="version",
+                        version=f"%(prog)s spec {SPEC_VERSION}")
     parser.add_argument("repos", nargs="+")
     parser.add_argument("--json", action="store_true",
                         help="emit one JSON object per repo")
